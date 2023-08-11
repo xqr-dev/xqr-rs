@@ -51,19 +51,34 @@ pub struct XQRClaims {
 /// * `private_key_pem` - The private key in PEM format.
 /// * `value` - The value to encode into the JWT token.
 /// * `kid` - The key ID, typically a URL that identifies the key.
+/// * `valid_for` - The duration for which the token is valid. If not specified, the XQR will be valid forever.
 ///
 /// # Returns
 ///
 /// A Result containing the XQR structure or an error if the operation fails.
-pub fn encode(private_key_pem: &str, value: &str, kid: &str) -> Result<XQR, Error> {
+pub fn encode(
+    private_key_pem: &str,
+    value: &str,
+    kid: &str,
+    valid_for: Option<Duration>,
+) -> Result<XQR, Error> {
     let key_pair = ES256KeyPair::from_pem(private_key_pem)?;
     let key_pair = key_pair.with_key_id(kid);
-    let claims = Claims::with_custom_claims(
+    let initial_duration = match valid_for {
+        Some(duration) => duration,
+        // with_custom_claims requires a non-None duration, so we use 0 if valid_for is None.
+        // After creating the claims, we'll set the expires_at value to None.
+        None => Duration::from_hours(0),
+    };
+    let mut claims = Claims::with_custom_claims(
         XQRClaims {
             value: value.to_string(),
         },
-        Duration::from_hours(2),
+        initial_duration,
     );
+    if valid_for.is_none() {
+        claims.expires_at = None;
+    }
     let token = key_pair.sign(claims)?;
 
     Ok(XQR { token })
@@ -146,7 +161,7 @@ mod tests {
         let value = "value";
         let kid = "example.com#123";
 
-        let encoded_xqr = encode(&private_key, value, kid).unwrap();
+        let encoded_xqr = encode(&private_key, value, kid, None).unwrap();
         let decoded_value = decode(&public_key, encoded_xqr).unwrap();
 
         assert_eq!(decoded_value, value);
@@ -160,7 +175,7 @@ mod tests {
         let value = "value";
         let kid = "example.com#123";
 
-        let encoded_xqr = encode(&private_key, value, kid).unwrap();
+        let encoded_xqr = encode(&private_key, value, kid, None).unwrap();
         let decoded_value = decode(&public_key, encoded_xqr);
 
         assert!(decoded_value.is_err());
@@ -173,7 +188,7 @@ mod tests {
         let value = "value";
         let kid = "example.com#123";
 
-        let encoded_xqr = encode(&private_key, value, kid).unwrap();
+        let encoded_xqr = encode(&private_key, value, kid, None).unwrap();
 
         assert_eq!(encoded_xqr.get_kid().unwrap(), kid);
     }
@@ -200,7 +215,7 @@ mod tests {
         let value = "value";
         let kid = "example.com#123";
 
-        let encoded_xqr = encode(&private_key, value, kid).unwrap();
+        let encoded_xqr = encode(&private_key, value, kid, None).unwrap();
 
         assert_eq!(encoded_xqr.to_string(), encoded_xqr.token);
     }
@@ -212,9 +227,42 @@ mod tests {
         let value = "value";
         let kid = "example.com#123";
 
-        let encoded_xqr = encode(&private_key, value, kid).unwrap();
+        let encoded_xqr = encode(&private_key, value, kid, None).unwrap();
         let encoded_xqr_string = encoded_xqr.to_string();
 
         assert_eq!(XQR::from(encoded_xqr_string), encoded_xqr);
+    }
+
+    #[test]
+    fn expiration_is_not_set_when_valid_for_is_none() {
+        let key_pair = generate_key_pair();
+        let private_key = key_pair.to_pem().unwrap();
+        let pub_key = key_pair.public_key();
+        let value = "value";
+        let kid = "example.com#123";
+
+        let encoded_xqr = encode(&private_key, value, kid, None).unwrap();
+        let claims = pub_key
+            .verify_token::<XQRClaims>(&encoded_xqr.token, None)
+            .unwrap();
+
+        assert!(claims.expires_at.is_none());
+    }
+
+    #[test]
+    fn expiration_is_set_when_valid_for_is_not_none() {
+        let key_pair = generate_key_pair();
+        let private_key = key_pair.to_pem().unwrap();
+        let pub_key = key_pair.public_key();
+        let value = "value";
+        let kid = "example.com#123";
+        let valid_for = Duration::from_secs(60);
+
+        let encoded_xqr = encode(&private_key, value, kid, Some(valid_for)).unwrap();
+        let claims = pub_key
+            .verify_token::<XQRClaims>(&encoded_xqr.token, None)
+            .unwrap();
+
+        assert!(claims.expires_at.is_some());
     }
 }

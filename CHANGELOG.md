@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Add `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md` for community guidelines
+- **Breaking change**: `encode` now takes a `valid_for` argument to set how long the token is valid for
+  - This can be set to `None` to make the token valid forever
 
 ## [0.2.0] - 2022-08-11
 ### Added
