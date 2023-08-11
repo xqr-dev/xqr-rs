@@ -1,11 +1,25 @@
 name: Publish to crates.io
 
+permissions:
+  contents: write
+
 on:
   push:
     tags:
       - v[0-9]+.*
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: taiki-e/create-gh-release-action@v1
+        with:
+          # (optional) Path to changelog.
+          changelog: CHANGELOG.md
+          # (required) GitHub token for creating GitHub Releases.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
   publish:
     name: Publish
     runs-on: ubuntu-latest
