@@ -6,7 +6,7 @@ description = "eXtended QR Codes"
 homepage = "https://xqr.dev"
 repository = "https://github.com/xqr-dev/xqr-rs"
 readme = "README.md"
-license = " GPL-3.0-only"
+license = "GPL-3.0-only"
 keywords = ["secure", "qr", "code"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
