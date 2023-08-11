@@ -1,0 +1,17 @@
+[package]
+name = "xqr"
+version = "0.1.0"
+edition = "2021"
+description = "eXtended QR Codes"
+homepage = "https://xqr.dev"
+repository = "https://github.com/xqr-dev/xqr-rs"
+readme = "README.md"
+license = " GPL-3.0-only"
+keywords = ["secure", "qr", "code"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+jsonwebtoken = "8"
+serde = {version = "1.0", features = ["derive"] }
