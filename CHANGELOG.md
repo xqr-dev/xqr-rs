@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md` for community guidelines
+
 ## [0.2.0] - 2022-08-11
 ### Added
 - Add `fetch_public_key` to fetch a public key based on a key id
