@@ -8,8 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **Breaking change**: `decode` now borrows the XQR instead of taking ownership of it
-  - This allows the XQR to be reused after decoding
+- **Breaking changes**: 
+  - `decode` now borrows the XQR instead of taking ownership of it
+    - This allows the XQR to be reused after decoding
+  - `encode` takes an issuer rather than key id
+  - `fetch_public_key` takes an issuer in addition to key id
+    - This allows the issuer to be used to fetch the public key and look up by key id
+- Change from `jwt-simple` to `jwtk`
 
 ## [0.3.0] - 2023-08-11
 ### Added
