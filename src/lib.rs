@@ -94,10 +94,11 @@ pub fn encode(
 /// # Returns
 ///
 /// A Result containing the decoded value as a String or an error if the operation fails.
-pub fn decode(public_key_pem: &str, xqr: XQR) -> Result<String, Error> {
+pub fn decode(public_key_pem: &str, xqr: &XQR) -> Result<String, Error> {
     let public_key = ES256PublicKey::from_pem(public_key_pem)?;
-    let token = xqr.token;
-    let claims = public_key.verify_token::<XQRClaims>(&token, None)?.custom;
+    let claims = public_key
+        .verify_token::<XQRClaims>(&xqr.token, None)?
+        .custom;
 
     Ok(claims.value)
 }
@@ -159,10 +160,9 @@ mod tests {
         let private_key = key_pair.to_pem().unwrap();
         let public_key = key_pair.public_key().to_pem().unwrap();
         let value = "value";
-        let kid = "example.com#123";
 
-        let encoded_xqr = encode(&private_key, value, kid, None).unwrap();
-        let decoded_value = decode(&public_key, encoded_xqr).unwrap();
+        let encoded_xqr = encode(&private_key, value, "example.com#123", None).unwrap();
+        let decoded_value = decode(&public_key, &encoded_xqr).unwrap();
 
         assert_eq!(decoded_value, value);
     }
@@ -176,7 +176,7 @@ mod tests {
         let kid = "example.com#123";
 
         let encoded_xqr = encode(&private_key, value, kid, None).unwrap();
-        let decoded_value = decode(&public_key, encoded_xqr);
+        let decoded_value = decode(&public_key, &encoded_xqr);
 
         assert!(decoded_value.is_err());
     }

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Breaking change**: `decode` now borrows the XQR instead of taking ownership of it
+  - This allows the XQR to be reused after decoding
+
 ## [0.3.0] - 2023-08-11
 ### Added
 - Add `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md` for community guidelines
