@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2023-08-12
 ### Changed
 - **Breaking changes**: 
   - `decode` now borrows the XQR instead of taking ownership of it
