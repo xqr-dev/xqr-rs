@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Breaking change**: `decode` now borrows the XQR instead of taking ownership of it
   - This allows the XQR to be reused after decoding
+- Change from `jwt-simple` to `jwtk`
 
 ## [0.3.0] - 2023-08-11
 ### Added
